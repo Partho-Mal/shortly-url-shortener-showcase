@@ -97,8 +97,3 @@ yarn-error.log*
 *.tar
 docker-compose.override.yml
 .docker/
-
-# ===================================
-# Allow safe environment templates
-# ===================================
-!.env.example

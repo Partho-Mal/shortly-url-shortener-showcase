@@ -1,19 +1,12 @@
-// Command server runs the main HTTP server for the Shortly backend.
+// Command server runs the main HTTP server for the Go backend.
 //
 // Usage:
-//
-// docker compose up postgres redis
-//	go run cmd/server/main.go --env=.env
-//	go run cmd/server/main.go --env=.env.local
-//
-// or
-// docker compose run --service-ports shortly
+//   go run cmd/server/main.go --env=.env
 package main
 
 import (
 	"flag"
 	"go_backend/internal/storage"
-	"go_backend/router"
 	"log"
 	"os"
 
@@ -22,25 +15,27 @@ import (
 )
 
 func main() {
-	// Load environment variables from file (optional for Docker)
-	envFile := flag.String("env", ".env", "path to environment file")
+
+	// Load environment
+	envFile := flag.String("env", ".env", "environment file to load")
 	flag.Parse()
 
+	// Try loading environment variables. Ignore errors in Docker.
 	if err := godotenv.Load(*envFile); err != nil {
-		log.Printf("server: could not load %s: %v", *envFile, err)
+		log.Printf("could not load %s %v", *envFile, err)
 	} else {
-		log.Printf("server: environment loaded from %s", *envFile)
+		log.Printf("loaded environment from %s", *envFile)
 	}
 
-	// Use ReleaseMode for optimized production performance.
+	// Optimize runtime performance
 	gin.SetMode(gin.ReleaseMode)
 
-	// Initialize external services.
+	// Initialize external services (e.g., Redis, Database)
 	if err := storage.InitRedis(); err != nil {
-		log.Fatalf("server: Redis initialization failed: %v", err)
+		log.Fatalf("Redis initialization falied: %v", err)
 	}
 
-	// Read configuration values (Docker-friendly defaults).
+	// Configuration (with Docker-friendly fallbacks)
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -48,23 +43,24 @@ func main() {
 
 	trustedProxy := os.Getenv("TRUSTED_PROXY")
 	if trustedProxy == "" {
-		trustedProxy = "0.0.0.0"
+		trustedProxy = "0.0.0.0" 
 	}
 
-	// Create a new Gin router and attach middlewares.
-	engine := gin.New()
-	engine.Use(gin.Logger(), gin.Recovery())
+	// Setup Gin router
+	routerEngine := gin.New()
+	routerEngine.Use(gin.Logger(), gin.Recovery())
 
-	if err := engine.SetTrustedProxies([]string{trustedProxy}); err != nil {
-		log.Fatalf("server: failed to set trusted proxies: %v", err)
+	if err := routerEngine.SetTrustedProxies([]string{trustedProxy}); err != nil {
+		log.Fatalf("Failed to set trusted proxies: %v", err)
 	}
 
-	// Register all routes.
-	engine = router.SetupRouter(engine)
+	// Load routes from router package
+	routerEngine = router.SetupRouter(routerEngine)
 
-	// Start the HTTP server.
-	log.Printf("server: starting on port http://localhost:%s", port)
-	if err := engine.Run(":" + port); err != nil {
-		log.Fatalf("server: startup failed: %v", err)
+	// Start HTTP server
+	log.Printf("Server starting on :%s", port)
+
+	if err := routerEngine.Run(":" + port); err != nil {
+		log.Fatalf("Server failed to start: %v")
 	}
 }
