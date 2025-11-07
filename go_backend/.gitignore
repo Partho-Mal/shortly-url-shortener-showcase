@@ -1,0 +1,99 @@
+# ===================================
+# Global
+# ===================================
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.bak
+*.env
+*.env.*
+.env.local
+.env.production
+.env.development
+.env.test
+node_modules/
+dist/
+build/
+coverage/
+.idea/
+.vscode/
+.npm/
+.yarn/
+*.lock
+.cache/
+*.pid
+*.seed
+*.tgz
+*.zip
+
+# ===================================
+# Go (Backend)
+# ===================================
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+*.o
+*.a
+
+# Go workspace files
+go.work
+go.work.sum
+
+# Compiled binary output
+bin/
+main
+*.log
+
+# Vendor and dependency cache
+/vendor/
+go.sum.backup
+__debug_bin
+
+# Temporary data
+*.db
+*.sqlite
+tmp/
+*.log
+*.pem
+*.crt
+*.key
+
+# ===================================
+# Next.js (Frontend)
+# ===================================
+.next/
+out/
+.cache/
+public/videos/
+public/temp/
+coverage/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===================================
+# OS / Editor
+# ===================================
+*.sublime-project
+*.sublime-workspace
+*.iml
+*.code-workspace
+*.project
+*.idea/
+*.vscode/
+*.history/
+
+# ===================================
+# Docker
+# ===================================
+*.pid
+*.tar
+docker-compose.override.yml
+.docker/
