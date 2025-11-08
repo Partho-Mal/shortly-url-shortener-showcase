@@ -1,27 +1,28 @@
 #!/bin/bash
-# ============================================================
-# 🧹 Docker Cleanup Script
-# Purpose: Stop, remove, and clean all Docker containers,
-# images, volumes, and networks.
-# Safe for local development reset or rebuild.
+# ============================================================================
+# Full Docker Cleanup Script
 #
-# Run by 
-# cd go_backend
-# make it executable by chmod +x ./bin/bash/all_docker_cleanup.sh
-# run by using ./bin/bash/all_docker_cleanup.sh
-# ============================================================
+# Purpose:
+#   Stop, remove, and clean all Docker containers, images, volumes, and networks.
+#   Safe for local development reset or rebuild.
+#
+# Usage:
+#   cd go_backend
+#   chmod +x ./bin/bash/all_docker_cleanup.sh
+#   ./bin/bash/all_docker_cleanup.sh
+# ============================================================================
 
-set -e  # Exit immediately on any error
+set -e  # Exit immediately if any command fails
 
-echo "⚠️  WARNING: This will remove ALL Docker containers, images, volumes, and networks!"
+# Confirmation prompt
+echo "WARNING: This will remove ALL Docker containers, images, volumes, and networks!"
 read -p "Do you want to continue? (y/N): " confirm
-
 case "$confirm" in
   [yY][eE][sS]|[yY])
-    echo "🧹 Starting full Docker cleanup..."
+    echo "Starting full Docker cleanup..."
     ;;
   *)
-    echo "❌ Cleanup cancelled."
+    echo "Cleanup cancelled."
     exit 0
     ;;
 esac
@@ -30,40 +31,40 @@ esac
 # Step 1: Stop all running containers
 # ------------------------------------------------------------
 if [ "$(docker ps -q)" ]; then
-  echo "🚫 Stopping all running containers..."
+  echo "Stopping all running containers..."
   docker stop $(docker ps -q)
 else
-  echo "✅ No running containers found."
+  echo "No running containers found."
 fi
 
 # ------------------------------------------------------------
 # Step 2: Remove all containers
 # ------------------------------------------------------------
 if [ "$(docker ps -aq)" ]; then
-  echo "🗑️  Removing all containers..."
+  echo "Removing all containers..."
   docker rm -f $(docker ps -aq)
 else
-  echo "✅ No containers to remove."
+  echo "No containers to remove."
 fi
 
 # ------------------------------------------------------------
-# Step 3: Remove all images (optional)
+# Step 3: Remove all images
 # ------------------------------------------------------------
 if [ "$(docker images -q)" ]; then
-  echo "🧱 Removing all images..."
+  echo "Removing all images..."
   docker rmi -f $(docker images -q)
 else
-  echo "✅ No images to remove."
+  echo "No images to remove."
 fi
 
 # ------------------------------------------------------------
-# Step 4: Remove all volumes (⚠️ Wipes database data)
+# Step 4: Remove all volumes (WARNING: deletes all data)
 # ------------------------------------------------------------
 if [ "$(docker volume ls -q)" ]; then
-  echo "💾 Removing all volumes..."
+  echo "Removing all volumes..."
   docker volume rm $(docker volume ls -q)
 else
-  echo "✅ No volumes found."
+  echo "No volumes found."
 fi
 
 # ------------------------------------------------------------
@@ -71,27 +72,23 @@ fi
 # ------------------------------------------------------------
 NETWORKS=$(docker network ls --filter type=custom -q)
 if [ -n "$NETWORKS" ]; then
-  echo "🌐 Removing all custom networks..."
+  echo "Removing all custom networks..."
   docker network rm $NETWORKS
 else
-  echo "✅ No custom networks found."
+  echo "No custom networks found."
 fi
 
 # ------------------------------------------------------------
 # Step 6: Verification summary
 # ------------------------------------------------------------
 echo ""
-echo "🔍 Remaining Docker state:"
+echo "Remaining Docker state:"
 docker ps -a
 docker images
 docker volume ls
 docker network ls
 
 echo ""
-echo "✅ Docker cleanup completed successfully!"
+echo "Docker cleanup completed successfully."
 echo "You can now rebuild your stack with:"
-echo "👉 docker compose up --build"
-echo ""
-# ============================================================
-# End of Script
-# ============================================================
+echo "docker compose up --build"
