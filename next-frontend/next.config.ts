@@ -17,7 +17,7 @@ const nextConfig = {
         : [
             {
               protocol: 'https',
-              hostname: 'api.streamlab.in',
+              hostname: 'https://shortly-url-shortener-showcase.onrender.com',
               pathname: '/api/qr-code/**',
             },
           ]),
@@ -39,7 +39,7 @@ const nextConfig = {
       : [
           {
             source: '/api/:path*',
-            destination: 'https://api.streamlab.in/api/:path*',
+            destination: 'https://shortly-url-shortener-showcase.onrender.com/api/:path*',
           },
         ];
   },
