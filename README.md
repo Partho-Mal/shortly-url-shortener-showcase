@@ -1,8 +1,13 @@
 # Shortly URL Shortener - Showcase Edition
 
-> This repository contains the **frontend (Next.js)** and **backend (Go)** of the Shortly URL Shortener demo application. The full production build with advanced features is deployed at:
+# Shortly URL Shortener - Showcase Edition
+
+> This repository contains the **frontend (Next.js)** and **backend (Go)** of the Shortly URL Shortener demo application.  
+> The full production build with advanced features is deployed at:
 >
-> 🔗 **[https://shortly.streamlab.in](https://shortly.streamlab.in)**
+> 🔗 <a href="https://shortly.streamlab.in" target="_blank" rel="noopener noreferrer">
+> https://shortly.streamlab.in
+> </a>
 >
 > This public version is intentionally lighter and is structured to showcase code quality, engineering approach, and architectural decisions for review.
 
@@ -282,7 +287,10 @@ For hiring + collaboration
 
 ## ✅ Production Deployment
 
-> [https://shortly.streamlab.in](https://shortly.streamlab.in)
+> <a href="https://shortly.streamlab.in" target="_blank" rel="noopener noreferrer">
+>   https://shortly.streamlab.in
+> </a>
+
 
 This repository is a **simplified showcase version**.
 
