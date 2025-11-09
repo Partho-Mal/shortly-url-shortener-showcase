@@ -19,6 +19,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import WarmBackend from "@/components/WarmBackend";
 
 // Load Google Fonts with CSS variable support
 const geistSans = Geist({
@@ -130,6 +131,17 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        
+        <WarmBackend />
+        {/* 
+          Issues a one-time lightweight GET /health request to the backend.
+          Purpose:
+          - Helps reduce initial latency on cold-start serverless environments.
+          - Request is non-blocking; UI is unaffected.
+          Usage:
+          - Safe to keep mounted globally for best user experience.
+        */}
+
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
         </ThemeProvider>
