@@ -21,7 +21,7 @@ export default function AuthCallbackClient() {
 
     // Redirect if token is not present
     if (!token) {
-      router.push("/landing");
+      router.push("/");
       return;
     }
 
@@ -34,7 +34,7 @@ export default function AuthCallbackClient() {
     })
       .then(async (res) => {
         if (!res.ok) {
-          router.push("/landing");
+          router.push("/");
           return;
         }
 
@@ -48,7 +48,7 @@ export default function AuthCallbackClient() {
         );
 
         if (!verifyRes.ok) {
-          router.push("/landing");
+          router.push("/dashboard");
           return;
         }
 
