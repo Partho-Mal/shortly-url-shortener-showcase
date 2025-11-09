@@ -26,7 +26,7 @@ func SetCookieHandler(c *gin.Context) {
 	isLocalhost := strings.Contains(frontendOrigin, "localhost")
 	cookieDomain := "localhost"
 	if !isLocalhost {
-		cookieDomain = ".streamlab.in" // adjust as needed
+		cookieDomain = "shortly-url-shortener-showcase.vercel.app" // adjust as needed
 	}
 
 	secure := !isLocalhost // ✅ Only true in production
