@@ -54,24 +54,34 @@ const Navbar = () => {
 
   const handleLogout = async (): Promise<void> => {
     try {
-      // ❌ Temporarily skip backend logout
-      // await apiFetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_USER_LOGOUT}`, {
-      //   method: "POST",
-      // });
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
 
-      // ✅ Delete cookie client-side
-      document.cookie = "token=; path=/; max-age=0;";
-
-      // ✅ Delete fallback JWT
       localStorage.removeItem("jwt");
 
       router.push("/");
     } catch {
-      document.cookie = "token=; path=/; max-age=0;";
-      localStorage.removeItem("jwt");
       router.push("/");
     }
   };
+
+  // since we are not on the same domain this block is commented
+  // const handleLogout = async (): Promise<void> => {
+  //   try {
+  //     await apiFetch(
+  //       `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_USER_LOGOUT}`,
+  //       {
+  //         method: "POST",
+  //       }
+  //     );
+  //     localStorage.removeItem("jwt");
+  //     router.push("/");
+  //   } catch {
+  //     // Log only
+  //   }
+  // };
 
   const getPlanBadgeStyle = (p: string): string => {
     switch (p.toLowerCase()) {
