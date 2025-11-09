@@ -23,7 +23,7 @@ import { useEffect } from "react";
  */
 export default function WarmBackend(): null {
   useEffect(() => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
     // If backend URL is missing, exit early.
     if (!baseUrl) return;
