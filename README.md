@@ -1,7 +1,5 @@
 # Shortly URL Shortener - Showcase Edition
 
-# Shortly URL Shortener - Showcase Edition
-
 > This repository contains the **frontend (Next.js)** and **backend (Go)** of the Shortly URL Shortener demo application.  
 > The full production build with advanced features is deployed at:
 >
