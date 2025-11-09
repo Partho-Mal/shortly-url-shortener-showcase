@@ -20,6 +20,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import WarmBackend from "@/components/WarmBackend";
+import { Toaster } from "sonner";
 
 // Load Google Fonts with CSS variable support
 const geistSans = Geist({
@@ -144,6 +145,7 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
 
 
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <Toaster position="top-right" richColors closeButton /> 
           {children}
         </ThemeProvider>
       </body>
