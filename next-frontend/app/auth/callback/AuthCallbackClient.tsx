@@ -21,10 +21,9 @@ export default function AuthCallbackClient() {
 
     // Redirect if token is not present
     if (!token) {
-      router.push("/");
+      router.push("/landing");
       return;
     }
-
 
     // Forward token to backend to create auth cookie
     fetch("/api/auth/set-cookie", {
@@ -33,18 +32,9 @@ export default function AuthCallbackClient() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token }),
     })
-
-
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/set-cookie`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token }),
-    })
       .then(async (res) => {
         if (!res.ok) {
-          console.warn("DEBUG: Failed to set cookie. Redirecting to /");
-          router.push("/");
+          router.push("/landing");
           return;
         }
 
@@ -57,26 +47,28 @@ export default function AuthCallbackClient() {
           }
         );
 
-        if (verifyRes.ok) {
-          const user = await verifyRes.json();
+        if (!verifyRes.ok) {
+          router.push("/landing");
+          return;
+        }
 
-          if (from === "billing") {
-            router.push("/billing/choose"); // Go to billing payment step
-          } else if (user.plan === "pro") {
-            router.push("/dashboard");
-          } else {
-            router.push("/dashboard");
-          }
+        const user = await verifyRes.json();
+
+        // Redirect if login originated from billing
+        if (from === "billing") {
+          router.push("/billing/choose");
+          return;
+        }
+
+        // Redirect user based on plan
+        if (user.plan === "pro") {
+          router.push("/dashboard");
         } else {
-          console.warn(
-            "DEBUG: Cookie set, but user not authenticated. Redirecting to /landing"
-          );
-          router.push("/");
+          router.push("/dashboard");
         }
       })
-      .catch((err) => {
-        console.error("DEBUG: Fetch error while setting cookie:", err);
-        router.push("/");
+      .catch(() => {
+        router.push("/landing");
       });
   }, [searchParams, router]);
 

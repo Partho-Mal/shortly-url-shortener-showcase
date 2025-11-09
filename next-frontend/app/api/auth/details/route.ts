@@ -1,33 +1,42 @@
-// app/api/user/details/route.ts
+// app/api/auth/details/route.ts
 
 /**
- * Forwards user cookies to the backend to retrieve authenticated user details.
- * Returns the backend response payload as-is, preserving type (JSON or text).
+ * Reads token cookie from browser and forwards it to backend via Authorization header.
+ * This bypasses cross-domain cookie restrictions so backend can authenticate the user.
  */
 
-export async function GET(req: Request) {
-  // Read cookie header from request
-  const cookie = req.headers.get("cookie") ?? "";
+import { cookies } from "next/headers";
 
-  // Forward request to backend API with cookie for authentication
-  const res = await fetch(
+export async function GET() {
+  // ✅ cookies() must be awaited
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+
+  if (!token) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+    });
+  }
+
+  // ✅ Forward token to backend via Authorization header
+  const backendRes = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_USER_DETAILS}`,
     {
       method: "GET",
       headers: {
-        cookie,
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
-      credentials: "include",
     }
   );
 
-  // Deliberately parse as text to support both JSON and non-JSON responses
-  const data = await res.text();
+  const data = await backendRes.text();
 
   return new Response(data, {
-    status: res.status,
+    status: backendRes.status,
     headers: {
-      "Content-Type": res.headers.get("Content-Type") ?? "application/json",
+      "Content-Type":
+        backendRes.headers.get("Content-Type") ?? "application/json",
     },
   });
 }
