@@ -1,36 +1,218 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# next-frontend · Shortly (Showcase Edition)
 
-## Getting Started
+This repository contains the **showcase Next.js frontend for Shortly**, a URL-shortening + QR system.
+It is intentionally lighter than the full production system and exists primarily so hiring teams and engineers can evaluate the architecture, code style, and patterns.
 
-First, run the development server:
+The full platform with advanced features is available at:
+[https://shortly.streamlab.in](https://shortly.streamlab.in)
+
+The complete source for this demo is open on GitHub.
+
+---
+
+## Table of Contents
+
+1. Overview
+2. Features
+3. Tech Stack
+4. Getting Started
+5. Development Commands
+6. Environment Variables
+7. Project Structure
+8. Code Style & Conventions
+9. UI System (shadcn/ui)
+10. Notes
+11. License
+
+---
+
+## 1) Overview
+
+Shortly-frontend is a **Next.js App Router project** used to:
+
+* Create short links
+* View & manage user links
+* Generate QR codes
+* Display visit analytics (basic)
+* Provide a lightweight dashboard experience
+
+This project integrates with a Go backend via REST APIs.
+
+---
+
+## 2) Features
+
+* Public short-link creation
+* Authenticated link management
+* Basic QR code generation
+* Visit count + last visit timestamps
+* Theme toggling (light/dark/system)
+* Mobile-aware sidebar + tooltip/drawer switching
+
+*Excluded from this demo:*
+
+* Payments
+* Org-level features
+* Deep analytics
+* Billing
+* RBAC
+
+---
+
+## 3) Tech Stack
+
+| Layer      | Stack                           |
+| ---------- | ------------------------------- |
+| Framework  | Next.js (App Router)            |
+| Language   | TypeScript                      |
+| UI         | shadcn/ui + TailwindCSS         |
+| Icons      | lucide-react                    |
+| Data Fetch | fetch + wrapper (`apiFetch.ts`) |
+| Auth       | Cookie-based (Go backend)       |
+| Utilities  | date-fns, clsx, tailwind-merge  |
+
+---
+
+## 4) Getting Started
+
+### Prerequisites
+
+* Node >= 18
+* Backend running locally (`shorty-go`)
+
+### Install dependencies
+
+```bash
+npm install
+```
+
+### Configure environment
+
+Copy `.env.example` to `.env.local` and update required keys.
+
+```bash
+cp .env.example .env.local
+```
+
+### Start dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Frontend:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Backend expected at:
 
-## Learn More
+```
+http://localhost:8080
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 5) Development Commands
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run dev       # Start app
+npm run build     # Production build
+npm run lint      # Static analysis
+npm run start     # Run built app
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 6) Environment Variables
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Main variables:
+
+```
+NEXT_PUBLIC_BACKEND_URL
+NEXT_PUBLIC_API_URL
+NEXT_PUBLIC_USER_DETAILS
+NEXT_PUBLIC_USER_SHORTLINKS
+NEXT_PUBLIC_DELETE_SHORTLINK_ENDPOINT
+NEXT_PUBLIC_OPTIONALCREATION
+```
+
+See `.env.example` for all available keys.
+
+---
+
+## 7) Project Structure
+
+```
+.
+├── app
+│   ├── api
+│   ├── auth
+│   ├── dashboard
+│   ├── globals.css
+│   ├── landing
+│   ├── layout.tsx
+│   ├── login
+│   ├── page.tsx
+│   ├── privacy-policy
+│   ├── signup
+│   └── terms-of-service
+├── components
+│   ├── AppSidebar.tsx
+│   ├── Footer.tsx
+│   ├── Header.tsx
+│   ├── Navbar.tsx
+│   ├── NoLoginShortenLinkForm.tsx
+│   ├── QRCodeCustomizer.tsx
+│   ├── ShortLinkForm.tsx
+│   ├── ShortLinksList.tsx
+│   ├── VideoPlayerSmart.tsx
+│   └── ui  # shadcn components
+├── hooks
+├── lib
+├── utils
+├── public
+├── tsconfig.json
+├── next.config.ts
+├── package.json
+└── README.md
+```
+
+---
+
+## 8) Code Style & Conventions
+
+* TypeScript throughout
+* Typed props
+* Small single‑purpose functions
+* Comments focused on intent and behavior
+* Minimal global state
+* Simple fetch wrapper via `apiFetch.ts`
+
+Comments should prioritize clarity.
+
+---
+
+## 9) UI System (shadcn/ui)
+
+UI primitives are sourced from:
+[https://ui.shadcn.com](https://ui.shadcn.com)
+
+* Headless, composable React components
+* Local, versioned under `components/ui/*`
+* Avoid modifying primitives directly. Prefer composition.
+
+---
+
+## 10) Notes
+
+* This is a showcase build designed for hiring/evaluation
+* Core flows implemented; advanced flows intentionally excluded
+* Backend handles auth and business logic
+
+---
+
+## 11) License
+
+MIT License

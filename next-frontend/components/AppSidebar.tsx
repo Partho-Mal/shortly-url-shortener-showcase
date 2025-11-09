@@ -1,13 +1,18 @@
+// components/AppSidebar.tsx
+
+/**
+ * Renders the main sidebar for dashboard navigation.
+ * Handles both desktop and mobile sidebar states using context.
+ */
+
 "use client";
 
 import Link from "next/link";
 import Image from "next/image";
 import {
   Home,
-  Settings,
   LinkIcon,
   QrCodeIcon,
-  BarChart2,
   XIcon,
 } from "lucide-react";
 import {
@@ -28,7 +33,6 @@ const items = [
   { title: "Home", url: "/dashboard", icon: Home },
   { title: "Links", url: "/dashboard/links", icon: LinkIcon },
   { title: "QR Codes", url: "/dashboard/makeqr", icon: QrCodeIcon },
-  // { title: "Analytics", url: "/dashboard/analytics", icon: BarChart2 },
 ];
 
 const AppSidebar = () => {
@@ -39,7 +43,11 @@ const AppSidebar = () => {
       {isMobile && openMobile ? (
         <SidebarHeader className="px-4 py-4 border-b">
           <div className="w-full flex items-center justify-between">
-            <Link href="/dashboard" onClick={() => isMobile && setOpenMobile(false)} className="flex items-center gap-2 mt-1">
+            <Link
+              href="/dashboard"
+              onClick={() => isMobile && setOpenMobile(false)}
+              className="flex items-center gap-2 mt-1"
+            >
               <Image src="/favicon.svg" width={30} height={30} alt="Logo" />
               <span className="font-semibold">Shortly</span>
             </Link>
@@ -59,7 +67,12 @@ const AppSidebar = () => {
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
                 <Link href="/dashboard">
-                  <Image src="/favicon.svg" width={500} height={500} alt="Logo" />
+                  <Image
+                    src="/favicon.svg"
+                    width={500}
+                    height={500}
+                    alt="Logo"
+                  />
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -72,6 +85,7 @@ const AppSidebar = () => {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Applications</SidebarGroupLabel>
+
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
@@ -89,18 +103,6 @@ const AppSidebar = () => {
               ))}
 
               <Separator />
-
-              {/* <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <Link
-                    href="/dashboard/settings"
-                    onClick={() => isMobile && setOpenMobile(false)}
-                  >
-                    <Settings />
-                    <span>Settings</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem> */}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

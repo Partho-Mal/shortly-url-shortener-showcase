@@ -1,4 +1,5 @@
 // app/layout.tsx
+
 /**
  * Root layout for Shortly URL Shortener
  *

@@ -97,3 +97,8 @@ yarn-error.log*
 *.tar
 docker-compose.override.yml
 .docker/
+
+# ===================================
+# ignore paths
+# ===================================
+!.env.example

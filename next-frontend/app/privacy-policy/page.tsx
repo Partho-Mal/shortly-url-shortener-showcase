@@ -1,3 +1,10 @@
+// app/dashboard/privacy-policy/page.tsx
+
+/**
+ * Renders the Privacy Policy page.
+ * Describes how authentication data is handled and how users can contact for inquiries.
+*/
+
 import Footer from "@/components/Footer";
 import  Header from "@/components/Header";
 import Link from "next/link";
@@ -6,27 +13,44 @@ export default function PrivacyPolicyPage() {
   return (
     <div className="flex flex-col min-h-screen w-full">
       <Header />
-      <main className="flex-grow">
+      <main className="grow">
         <div className="max-w-3xl mx-auto py-10 px-4">
           <h1 className="text-3xl font-bold mb-4">Privacy Policy</h1>
+
           <p className="mb-4">
-            This application, Shortly (https://shortly.streamlab.in), uses Google Login for authentication purposes only.
-            We do not collect, store, or share any personal data beyond what is required to authenticate you via Google.
+            This application uses Google Login solely for user authentication.
+            We do not sell, rent, or trade your personal information.
           </p>
+
           <p className="mb-4">
-            Your email and basic profile information (name and profile image) may be used to personalize your experience,
-            but none of this data is stored on our servers without your explicit consent.
+            During authentication, we may access basic information such as
+            your name and email address. This is only used to identify your
+            account within the platform.
           </p>
+
           <p className="mb-4">
-            We are committed to protecting your privacy. If you have any questions or concerns, feel free to contact us at{" "}
+            No sensitive information is collected without your consent.
+            Authentication data may be stored only for login, session handling,
+            and security purposes. We do not share this data with third parties.
+          </p>
+
+          <p className="mb-4">
+            If you have any questions, concerns, or wish to discuss work
+            or opportunities, you may contact us at:
+          </p>
+
+          <p className="mb-4">
             <Link
-              href="https://mail.google.com/mail/?view=cm&fs=1&to=support@streamlab.in&su=Support%20Request&body=Hi%20team,"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="mailto:parthoma7@gmail.com"
               className="text-blue-600 hover:underline"
             >
-              support@streamlab.in
+              parthoma7@gmail.com
             </Link>
+          </p>
+
+          <p className="text-sm text-muted-foreground">
+            This policy may be updated occasionally. Continued usage of the
+            application implies acceptance of the latest version.
           </p>
         </div>
       </main>
@@ -34,3 +58,5 @@ export default function PrivacyPolicyPage() {
     </div>
   );
 }
+
+

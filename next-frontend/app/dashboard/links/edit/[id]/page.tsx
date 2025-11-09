@@ -1,4 +1,11 @@
 // next-frontend/app/dashboard/links/edit/[id]/page.tsx
+
+/**
+ * Page for editing an existing short link.
+ * Loads current link details, allows updating slug and/or URL,
+ * validates input, and sends update request to backend.
+ */
+
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
@@ -21,22 +28,27 @@ export default function EditShortLinkPage() {
   const [newURL, setNewURL] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const isValidSlug = (slug: string) => /^[a-zA-Z0-9_-]{3,}$/.test(slug);
+  // Validate slug format
+  const isValidSlug = (value: string): boolean =>
+    /^[a-zA-Z0-9_-]{3,}$/.test(value);
 
   useEffect(() => {
-    const fetchLinkDetails = async () => {
+    const fetchLinkDetails = async (): Promise<void> => {
       try {
         const res = await fetch(`${API_URL}/dashboard/links/${slug}`, {
           credentials: "include",
         });
+
         const data = await res.json();
+
         if (!res.ok) {
           toast.error(data.error || "Failed to fetch link details.");
-        } else {
-          setPlaceholderSlug(data.slug || "");
-          setPlaceholderURL(data.original_url || "");
-          setUUID(data.id || "");
+          return;
         }
+
+        setPlaceholderSlug(data.slug ?? "");
+        setPlaceholderURL(data.original_url ?? "");
+        setUUID(data.id ?? "");
       } catch {
         toast.error("Error loading link.");
       }
@@ -45,7 +57,7 @@ export default function EditShortLinkPage() {
     fetchLinkDetails();
   }, [slug]);
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (): Promise<void> => {
     const payload: Record<string, string> = {
       id: uuid,
       custom_domain: "",
@@ -54,6 +66,7 @@ export default function EditShortLinkPage() {
     const trimmedSlug = newSlug.trim();
     const trimmedURL = newURL.trim();
 
+    // Validate and append slug if provided
     if (trimmedSlug) {
       if (!isValidSlug(trimmedSlug)) {
         toast.error(
@@ -64,16 +77,19 @@ export default function EditShortLinkPage() {
       payload.new_slug = trimmedSlug;
     }
 
+    // Append URL if provided
     if (trimmedURL) {
       payload.new_url = trimmedURL;
     }
 
+    // Require at least one field
     if (!payload.new_slug && !payload.new_url) {
       toast.error("Please provide at least one field to update.");
       return;
     }
 
     setLoading(true);
+
     try {
       const res = await fetch(`${API_URL}/dashboard/links/edit`, {
         method: "POST",
@@ -83,12 +99,14 @@ export default function EditShortLinkPage() {
       });
 
       const data = await res.json();
+
       if (res.ok) {
         toast.success("Shortlink updated successfully.");
         router.push("/dashboard/links");
-      } else {
-        toast.error(data.error || "Update failed.");
+        return;
       }
+
+      toast.error(data.error || "Update failed.");
     } catch {
       toast.error("Something went wrong while updating.");
     } finally {
@@ -96,13 +114,12 @@ export default function EditShortLinkPage() {
     }
   };
 
-
   return (
     <main className="p-6 max-w-xl mx-auto space-y-6">
       <h1 className="text-2xl font-bold">Edit Short Link</h1>
 
       <div>
-        <Label htmlFor="slug">New back-half </Label>
+        <Label htmlFor="slug">New back-half</Label>
         <Input
           id="slug"
           placeholder={placeholderSlug}
@@ -113,7 +130,7 @@ export default function EditShortLinkPage() {
       </div>
 
       <div>
-        <Label htmlFor="url">New Destination URL </Label>
+        <Label htmlFor="url">New Destination URL</Label>
         <Input
           id="url"
           placeholder={placeholderURL}

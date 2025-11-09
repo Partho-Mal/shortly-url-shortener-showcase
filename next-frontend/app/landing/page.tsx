@@ -65,7 +65,7 @@ export default function LandingPage() {
   // const goToPricing = () => router.push("/pricing");
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-white via-slate-100 to-slate-200 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-700 flex flex-col">
+    <div className="min-h-screen w-full bg-linear-to-br from-white via-slate-100 to-slate-200 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-700 flex flex-col">
       {/* Header */}
         <Header />
 
@@ -130,7 +130,7 @@ export default function LandingPage() {
         </div>
       </header> */}
 
-      <main className="flex-grow">
+      <main className="grow">
       
 
       {/* Hero Section */}
@@ -210,7 +210,7 @@ export default function LandingPage() {
           <Button
             // variant="link"
             onClick={goToLogin}
-            className="mt-4 px-6 py-2 _rounded-xl font-medium text-white bg-gradient-to-r from-fuchsia-500 via-violet-600 to-indigo-500 hover:brightness-95 hover:shadow-md transition duration-200"
+            className="mt-4 px-6 py-2 _rounded-xl font-medium text-white bg-linear-to-r from-fuchsia-500 via-violet-600 to-indigo-500 hover:brightness-95 hover:shadow-md transition duration-200"
             >
             <Link className="h-4 w-4" /> Login to manage your links
           </Button>
@@ -218,7 +218,7 @@ export default function LandingPage() {
           {/* <Button
             // variant="link"
             onClick={goToPricing}
-            className="mt-4 px-6 py-2 _rounded-xl font-medium text-white bg-gradient-to-r from-fuchsia-500 via-violet-600 to-indigo-500 hover:brightness-95 hover:shadow-md transition duration-200 md:hidden "
+            className="mt-4 px-6 py-2 _rounded-xl font-medium text-white bg-linear-to-r from-fuchsia-500 via-violet-600 to-indigo-500 hover:brightness-95 hover:shadow-md transition duration-200 md:hidden "
             >
             <DollarSignIcon className="h-4 w-4" /> Pricing
           </Button> */}
@@ -263,7 +263,7 @@ export default function LandingPage() {
 
  
         {/* <section className="px-4 py-12 bg-white dark:bg-zinc-900"> */}
-        <section className="flex-grow">
+        <section className="grow">
         {/* Video component here */}
         <VideoPlayerSmart />
         </section>

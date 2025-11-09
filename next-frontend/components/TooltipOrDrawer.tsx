@@ -1,44 +1,84 @@
-import { useState, useEffect } from "react";
-import { Drawer, DrawerClose, DrawerContent, DrawerHeader, DrawerTitle } from "./ui/drawer";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+// components/TooltipOrDrawer.tsx
+
+/**
+ * TooltipOrDrawer
+ *
+ * Shows a tooltip on desktop and a drawer on mobile screens.
+ * Renders the same icon trigger while adapting UX across devices.
+ */
+
+"use client";
+
+import { useState, useEffect, type ReactNode } from "react";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+interface TooltipOrDrawerProps {
+  /** Trigger icon */
+  icon: ReactNode;
+  /** Body content (tooltip or drawer) */
+  content: ReactNode;
+  /** Optional title for Drawer */
+  label?: string;
+}
 
 export function TooltipOrDrawer({
   icon,
   content,
-  label,
-}: {
-  icon: React.ReactNode;
-  content: React.ReactNode;
-  label?: string;
-}) {
-  const [isMobile, setIsMobile] = useState(false);
-  const [open, setOpen] = useState(false);
+  label = "Info",
+}: TooltipOrDrawerProps) {
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
 
+  /**
+   * Handles device responsiveness
+   */
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 640); // Tailwind sm breakpoint approx
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
+    const mql = window.matchMedia("(max-width: 639px)"); // tailwind sm breakpoint
+    const onChange = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+
+    // Initial check
+    setIsMobile(mql.matches);
+
+    // Listen for changes
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
   }, []);
 
+  /**
+   * Mobile → Drawer
+   */
   if (isMobile) {
-    // Drawer on mobile
     return (
       <>
         <button
           aria-label={label}
-          onClick={() => setOpen(true)}
-          className="cursor-pointer"
           type="button"
+          className="cursor-pointer"
+          onClick={() => setOpen(true)}
         >
           {icon}
         </button>
+
         <Drawer open={open} onOpenChange={setOpen} modal>
           <DrawerContent className="max-w-md p-6">
             <DrawerHeader>
-              <DrawerTitle>{label || "Info"}</DrawerTitle>
+              <DrawerTitle>{label}</DrawerTitle>
               <DrawerClose />
             </DrawerHeader>
+
             <div className="mt-4">{content}</div>
           </DrawerContent>
         </Drawer>
@@ -46,11 +86,19 @@ export function TooltipOrDrawer({
     );
   }
 
-  // Tooltip on desktop
+  /**
+   * Desktop → Tooltip
+   */
   return (
     <TooltipProvider>
       <Tooltip>
-        <TooltipTrigger asChild>{icon}</TooltipTrigger>
+        <TooltipTrigger asChild>
+          {/* Ensure element wrapper since TooltipTrigger requires an element */}
+          <span className="cursor-pointer" role="button">
+            {icon}
+          </span>
+        </TooltipTrigger>
+
         <TooltipContent>{content}</TooltipContent>
       </Tooltip>
     </TooltipProvider>

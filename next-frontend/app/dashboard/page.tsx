@@ -1,3 +1,10 @@
+// app/dashboard/page.tsx
+
+/**
+ * Renders the main dashboard home page.
+ * Determines user authorization, displays a demo banner, and provides quick link creation.
+ */
+
 "use client";
 
 import {
@@ -20,41 +27,44 @@ export default function DashboardHome() {
   const [isAllowed, setIsAllowed] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const createlink = () => router.push("/dashboard/links/create");
-  const createqrcodes = () => router.push("/dashboard/makeqr");
-  const viewlinks = () => router.push("/dashboard/links");
-
   useEffect(() => {
-    if (pathname === "/dashboard") setActiveTab("short-link");
+    if (pathname === "/dashboard") {
+      setActiveTab("short-link");
+    }
   }, [pathname]);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUser = async (): Promise<void> => {
       try {
         const res = await fetch("/api/me");
         if (res.ok) {
           const data = await res.json();
-          setIsAllowed(data.allowed);
+          setIsAllowed(Boolean(data.allowed));
         }
-      } catch (err) {
-        console.error("Failed to fetch user", err);
+      } catch {
+        // Fetch failed; use defaults
       } finally {
         setLoading(false);
       }
     };
+
     fetchUser();
   }, []);
 
   return (
     <div className="flex flex-col gap-4 px-2 lg:px-6 2xl:px-30">
-
-      {/* howcase Banner */}
-      <div className="w-full bg-gradient-to-r from-cyan-500 via-sky-600 to-blue-700 text-white text-center py-3 px-4 rounded-lg shadow-md">
+      {/* Demo banner */}
+      <div className="w-full bg-linear-to-r from-cyan-500 via-sky-600 to-blue-700 text-white text-center py-3 px-4 rounded-lg shadow-md">
         <p className="text-sm md:text-base font-medium leading-relaxed">
-          ⚡ This is a <span className="font-semibold underline underline-offset-2">Showcase / Demo</span> version of the original{" "}
-          <span className="font-semibold text-yellow-300">Shortly</span> project.
+          ⚡ This is a{" "}
+          <span className="font-semibold underline underline-offset-2">
+            Showcase / Demo
+          </span>{" "}
+          version of the original{" "}
+          <span className="font-semibold text-yellow-300">Shortly</span>{" "}
+          project.
           <br className="hidden md:block" />
-          The full production version with more advanced features is available at{" "}
+          The full production version is available at{" "}
           <a
             href="https://shortly.streamlab.in"
             target="_blank"
@@ -62,9 +72,10 @@ export default function DashboardHome() {
             className="font-semibold text-yellow-200 hover:text-white underline underline-offset-2 transition-colors"
           >
             shortly.streamlab.in
-          </a>.
+          </a>
+          .
           <br className="hidden md:block" />
-          This lighter version is built specifically for hiring managers to review functionality while protecting proprietary code.
+          This version is intended for review by hiring managers.
         </p>
       </div>
 
@@ -76,7 +87,7 @@ export default function DashboardHome() {
         <Tabs
           defaultValue="short-link"
           value={activeTab}
-          onValueChange={(val) => setActiveTab(val)}
+          onValueChange={(val): void => setActiveTab(val)}
           className="w-full flex flex-col lg:flex-row gap-4"
         >
           <div className="w-full lg:w-2/3">
@@ -86,10 +97,16 @@ export default function DashboardHome() {
               <Card>
                 <CardHeader>
                   <CardTitle>Links</CardTitle>
-                  <CardDescription>Make short links instantly</CardDescription>
+                  <CardDescription>
+                    Make short links instantly
+                  </CardDescription>
                 </CardHeader>
+
                 <CardContent className="grid gap-6">
-                  <ShortLinkForm key={activeTab} isActive={activeTab === "short-link"} />
+                  <ShortLinkForm
+                    key={activeTab}
+                    isActive={activeTab === "short-link"}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>

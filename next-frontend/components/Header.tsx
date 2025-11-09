@@ -1,5 +1,11 @@
-//next-frontend\components\Header.tsx
-'use client';
+// components/Header.tsx
+
+/**
+ * Displays application header on public pages.
+ * Includes navigation, authentication shortcuts, and theme toggle.
+ */
+
+"use client";
 
 import { useRouter } from "next/navigation";
 import { Moon, Sparkles, Sun } from "lucide-react";
@@ -8,7 +14,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from "next-themes";
 
@@ -16,9 +22,8 @@ export default function Header() {
   const router = useRouter();
   const { setTheme } = useTheme();
 
-  const goToLogin = () => router.push("/login");
-  const goToSignup = () => router.push("/signup");
-  // const goToPricing = () => router.push("/pricing");
+  const goToLogin = (): void => router.push("/login");
+  const goToSignup = (): void => router.push("/signup");
 
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur-sm bg-white/70 dark:bg-zinc-900/70 border-b border-slate-200 dark:border-zinc-700">
@@ -34,27 +39,12 @@ export default function Header() {
           </span>
         </div>
 
-        {/* Navigation Links */}
-        {/* <div className="hidden sm:flex items-center gap-6">
-          <button
-            onClick={() => router.push("/landing")}
-            className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-primary cursor-pointer"
-          >
-            Home
-          </button>
-          <button
-            onClick={goToPricing}
-            className="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-primary cursor-pointer"
-          >
-            Pricing
-          </button>
-        </div> */}
-
-        {/* Auth Buttons & Theme Toggle */}
+        {/* Authentication and theme controls */}
         <div className="flex items-center gap-2">
           <Button variant="ghost" onClick={goToLogin}>
             Sign In
           </Button>
+
           <Button onClick={goToSignup}>
             Sign Up
           </Button>
@@ -67,13 +57,16 @@ export default function Header() {
                 <span className="sr-only">Toggle theme</span>
               </Button>
             </DropdownMenuTrigger>
+
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setTheme("light")}>
                 Light
               </DropdownMenuItem>
+
               <DropdownMenuItem onClick={() => setTheme("dark")}>
                 Dark
               </DropdownMenuItem>
+
               <DropdownMenuItem onClick={() => setTheme("system")}>
                 System
               </DropdownMenuItem>

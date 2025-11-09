@@ -1,8 +1,15 @@
+// components/NoLoginShortenLinkForm.tsx
+
+/**
+ * Form for publicly generating short URLs.
+ * Does not require user authentication.
+ */
+
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+  import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -22,23 +29,32 @@ import {
 } from "lucide-react";
 import { Label } from "./ui/label";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL!;
-const BACKEND_DOMAIN = process.env.NEXT_PUBLIC_BACKEND_URL!;
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
+const BACKEND_DOMAIN = process.env.NEXT_PUBLIC_BACKEND_URL ?? "";
 
 export default function NoLoginShortenLinkForm() {
+  /**
+   * Form state
+   */
   const [url, setUrl] = useState("");
   const [shortUrl, setShortUrl] = useState("");
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  /**
+   * Autofocus input on mount
+   */
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  // Check if URL starts with http:// or https://
-  const isValidUrl = (input: string) => {
+  /**
+   * Validates input URL for http/https format
+   */
+  const isValidUrl = (input: string): boolean => {
     try {
       const urlObj = new URL(input);
       return urlObj.protocol === "http:" || urlObj.protocol === "https:";
@@ -47,9 +63,12 @@ export default function NoLoginShortenLinkForm() {
     }
   };
 
-  const handleCreate = async () => {
+  /**
+   * Creates a public short URL
+   */
+  const handleCreate = async (): Promise<void> => {
     if (!isValidUrl(url)) {
-      alert("Please enter a valid URL starting with http:// or https://");
+      alert("Enter a valid URL starting with http:// or https://.");
       return;
     }
 
@@ -58,34 +77,37 @@ export default function NoLoginShortenLinkForm() {
     try {
       const res = await fetch(`${API_URL}/publicshorturl`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ original_url: url }),
       });
 
       const data = await res.json();
-      console.log("Shorten Response:", data);
 
       if (res.ok && data.slug) {
         setShortUrl(data.short_url ?? `${BACKEND_DOMAIN}/${data.slug}`);
         setOpen(true);
       } else {
-        alert(data.error || "Failed to shorten URL");
+        alert(data.error ?? "Failed to shorten URL.");
       }
     } catch {
-      alert("Something went wrong");
+      alert("Unexpected error occurred.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCopy = () => {
+  /**
+   * Copies result to clipboard
+   */
+  const handleCopy = (): void => {
     navigator.clipboard.writeText(shortUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
 
+  /**
+   * Sharing metadata
+   */
   const shareLinks = [
     {
       label: "WhatsApp",
@@ -94,9 +116,7 @@ export default function NoLoginShortenLinkForm() {
     },
     {
       label: "Facebook",
-      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-        shortUrl
-      )}`,
+      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shortUrl)}`,
       icon: <FacebookIcon className="h-5 w-5" />,
     },
     {
@@ -106,23 +126,17 @@ export default function NoLoginShortenLinkForm() {
     },
     {
       label: "Twitter",
-      url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(
-        shortUrl
-      )}`,
+      url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shortUrl)}`,
       icon: <TwitterIcon className="h-5 w-5" />,
     },
     {
       label: "Threads",
-      url: `https://www.threads.net/intent/post?url=${encodeURIComponent(
-        shortUrl
-      )}`,
+      url: `https://www.threads.net/intent/post?url=${encodeURIComponent(shortUrl)}`,
       icon: <Share2Icon className="h-5 w-5" />,
     },
     {
       label: "Email",
-      url: `mailto:?subject=Check this link&body=${encodeURIComponent(
-        shortUrl
-      )}`,
+      url: `mailto:?subject=Check this link&body=${encodeURIComponent(shortUrl)}`,
       icon: <MailIcon className="h-5 w-5" />,
     },
     {
@@ -132,12 +146,11 @@ export default function NoLoginShortenLinkForm() {
     },
     {
       label: "YouTube",
-      url: `https://www.youtube.com/`,
+      url: "https://www.youtube.com/",
       icon: <YoutubeIcon className="h-5 w-5" />,
     },
   ];
 
-  // Disable button if empty or invalid URL
   const isButtonDisabled = !isValidUrl(url) || loading;
 
   return (
@@ -160,29 +173,32 @@ export default function NoLoginShortenLinkForm() {
       <Button
         onClick={handleCreate}
         disabled={isButtonDisabled}
-        className="mt-4 px-6 py-2 rounded-xl font-medium text-white bg-gradient-to-r from-fuchsia-500 via-violet-600 to-indigo-500 hover:brightness-95 hover:shadow-md transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="mt-4 px-6 py-2 rounded-xl font-medium text-white bg-linear-to-r from-fuchsia-500 via-violet-600 to-indigo-500 hover:brightness-95 hover:shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {loading ? "Creating..." : "Create your Short link"}
+        {loading ? "Creating..." : "Create short link"}
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Your link is ready!</DialogTitle>
+            <DialogTitle>Your link is ready</DialogTitle>
           </DialogHeader>
+
           <p className="text-sm text-muted-foreground mb-2">
-            Copy the link below to share it or choose a platform to share it to.
+            Copy or share your shortened link.
           </p>
+
           <div className="flex items-center gap-2 bg-muted px-2 py-1 rounded-md">
             <input
               readOnly
               className="text-sm bg-transparent w-full outline-none"
               value={shortUrl}
             />
+
             <Button size="sm" variant="ghost" onClick={handleCopy}>
               <CopyIcon className="h-4 w-4" />
             </Button>
-            {copied && <span className="text-green-600 text-xs">Copied!</span>}
+            {copied && <span className="text-xs text-green-600">Copied</span>}
           </div>
 
           <div className="grid grid-cols-4 gap-2 mt-4">

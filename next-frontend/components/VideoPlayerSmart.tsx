@@ -1,39 +1,57 @@
-//next-frontend\components\VideoPlayerSmart.tsx
-'use client';
+// components/VideoPlayerSmart.tsx
 
-import { useEffect, useRef, useState } from 'react';
+/**
+ * VideoPlayerSmart
+ *
+ * Lazily displays a preview video after a small delay to improve LCP.
+ * Attempts to autoplay muted — if blocked, the user can manually start playback.
+ */
 
-export default function VideoPlayerSmart() {
-  const [showVideo, setShowVideo] = useState(false);
+"use client";
+
+import { useEffect, useRef, useState, type JSX } from "react";
+
+export default function VideoPlayerSmart(): JSX.Element {
+  const [isVisible, setIsVisible] = useState<boolean>(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  /**
+   * Displays video slightly later to improve LCP and attempts autoplay.
+   */
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setShowVideo(true);
+    const timeoutId = setTimeout(() => {
+      setIsVisible(true);
 
-      const video = videoRef.current;
-      if (video) {
-        video.muted = true;
-        video.playsInline = true;
-        video.autoplay = true;
+      const el = videoRef.current;
+      if (!el) return;
 
-        video.play().catch((err) => {
-          console.warn('Autoplay blocked:', err);
-        });
-      }
-    }, 500); // Slight delay to improve LCP
+      el.muted = true;
+      el.playsInline = true;
+      el.autoplay = true;
 
-    return () => clearTimeout(timeout);
+      el.play().catch((err) => {
+        // Autoplay is often blocked on mobile + desktop
+        console.warn("Autoplay blocked:", err);
+      });
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   return (
-    <section className="px-4 py-12 bg-white dark:bg-zinc-900">
-      <h1 className="text-4xl font-bold text-center mb-6 text-gray-900 dark:text-white">
+    <section
+      aria-labelledby="shortly-video-title"
+      className="px-4 py-12 bg-white dark:bg-zinc-900"
+    >
+      <h1
+        id="shortly-video-title"
+        className="mb-6 text-center text-4xl font-bold text-gray-900 dark:text-white"
+      >
         See Shortly in Action
       </h1>
 
-      <div className="max-w-4xl mx-auto rounded-lg shadow-lg overflow-hidden aspect-[16/9]">
-        {showVideo && (
+      <div className="mx-auto aspect-video max-w-4xl overflow-hidden rounded-lg shadow-lg">
+        {isVisible && (
           <video
             ref={videoRef}
             loop
@@ -42,9 +60,9 @@ export default function VideoPlayerSmart() {
             playsInline
             preload="metadata"
             controls
-            poster="/videos/shortlycovermaindark.png"
             controlsList="nodownload"
-            className="w-full h-full rounded-lg object-cover"
+            poster="/videos/shortlycovermaindark.png"
+            className="h-full w-full rounded-lg object-cover"
           >
             <source src="/videos/Shortly.webm" type="video/webm" />
             <source src="/videos/Shortly_small.mp4" type="video/mp4" />
@@ -56,4 +74,3 @@ export default function VideoPlayerSmart() {
     </section>
   );
 }
-

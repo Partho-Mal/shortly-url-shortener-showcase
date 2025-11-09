@@ -1,4 +1,17 @@
-//components/ShortLinkForm.tsx
+// components/ShortLinkForm.tsx
+
+/**
+ * ShortLinkForm
+ *
+ * A lightweight form for creating short URLs.
+ * Requires authenticated API; used inside dashboard tabs.
+ *
+ * Behaviors:
+ *  - Autofocuses when active (tab in view)
+ *  - Calls backend to generate a short link
+ *  - Displays share actions + copy action
+ */
+
 "use client";
 
 import { useEffect, useRef, useState } from "react";
@@ -21,104 +34,81 @@ import {
   CopyIcon,
   SendIcon,
 } from "lucide-react";
-import { Label } from "./ui/label";
+import { Label } from "@/components/ui/label";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 const BACKEND_DOMAIN = process.env.NEXT_PUBLIC_BACKEND_URL!;
 
 interface ShortLinkFormProps {
+  /** Whether this tab is currently active, used to manage autofocus */
   isActive: boolean;
-  }
-
+}
 
 export default function ShortLinkForm({ isActive }: ShortLinkFormProps) {
   const [url, setUrl] = useState("");
   const [shortUrl, setShortUrl] = useState("");
-  const [open, setOpen] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+
   const inputRef = useRef<HTMLInputElement>(null);
 
+  /**
+   * Focus input when visible. Avoids timing issues by deferring via timeout.
+   */
   useEffect(() => {
-    if (isActive) {
-      const timeout = setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100); // small delay to wait for TabsContent to render fully
-      return () => clearTimeout(timeout);
-    }
+    if (!isActive) return;
+    const timer = setTimeout(() => inputRef.current?.focus(), 100);
+    return () => clearTimeout(timer);
   }, [isActive]);
 
-
-  // useEffect(() => {
-  // if (!isActive || !inputRef.current) return;
-
-  // const observer = new IntersectionObserver(
-  //   (entries) => {
-  //     const [entry] = entries;
-  //     if (entry.isIntersecting) {
-  //       setTimeout(() => {
-  //         inputRef.current?.focus();
-  //       }, 50); // Delay helps after DOM paint
-  //     }
-  //   },
-  //   {
-  //     threshold: 1.0,
-  //   }
-  // );
-
-  // observer.observe(inputRef.current);
-
-  // return () => {
-  //     observer.disconnect();
-  //   };
-  // }, [isActive]);
-
-  
-  // useEffect(() => {
-  //   if (isActive) {
-  //     setTimeout(() => {
-  //       inputRef.current?.focus();
-  //     });
-  //   }
-  // }, [isActive]);
-
-
-  const handleCreate = async () => {
+  /**
+   * Handles short-link generation via API.
+   */
+  const handleCreate = async (): Promise<void> => {
     if (!url) return;
+
     setLoading(true);
 
     try {
       const res = await fetch(`${API_URL}/shorten`, {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ original_url: url }),
       });
 
       const data = await res.json();
-      console.log("Shorten Response:", data);
+
       if (res.ok && data.slug) {
         setShortUrl(data.short_url ?? `${BACKEND_DOMAIN}/${data.slug}`);
-        setOpen(true);
+        setOpenDialog(true);
       } else {
-        alert(data.error || "Failed to shorten URL");
+        alert(data.error || "Unable to create short link.");
       }
     } catch {
-      alert("Something went wrong");
+      alert("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCopy = () => {
+  /**
+   * Copies the generated URL to clipboard.
+   */
+  const handleCopy = (): void => {
     navigator.clipboard.writeText(shortUrl);
     setCopied(true);
-    setTimeout(() => setCopied(false), 1500); // Hide after 1.5 seconds
+
+    setTimeout(() => {
+      setCopied(false);
+    }, 1500);
   };
 
-  const shareLinks = [
+  /**
+   * Social sharing surface actions.
+   */
+  const shareTargets = [
     {
       label: "WhatsApp",
       url: `https://wa.me/?text=${encodeURIComponent(shortUrl)}`,
@@ -126,9 +116,7 @@ export default function ShortLinkForm({ isActive }: ShortLinkFormProps) {
     },
     {
       label: "Facebook",
-      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-        shortUrl
-      )}`,
+      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shortUrl)}`,
       icon: <FacebookIcon className="h-5 w-5" />,
     },
     {
@@ -138,23 +126,17 @@ export default function ShortLinkForm({ isActive }: ShortLinkFormProps) {
     },
     {
       label: "Twitter",
-      url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(
-        shortUrl
-      )}`,
+      url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shortUrl)}`,
       icon: <TwitterIcon className="h-5 w-5" />,
     },
     {
       label: "Threads",
-      url: `https://www.threads.net/intent/post?url=${encodeURIComponent(
-        shortUrl
-      )}`,
+      url: `https://www.threads.net/intent/post?url=${encodeURIComponent(shortUrl)}`,
       icon: <Share2Icon className="h-5 w-5" />,
     },
     {
       label: "Email",
-      url: `mailto:?subject=Check this link&body=${encodeURIComponent(
-        shortUrl
-      )}`,
+      url: `mailto:?subject=Check this link&body=${encodeURIComponent(shortUrl)}`,
       icon: <MailIcon className="h-5 w-5" />,
     },
     {
@@ -168,53 +150,69 @@ export default function ShortLinkForm({ isActive }: ShortLinkFormProps) {
       icon: <YoutubeIcon className="h-5 w-5" />,
     },
   ];
-  
 
   return (
     <div className="space-y-3">
-      <Label htmlFor="tabs-demo-name">Enter your destination URL</Label>
+      <Label>Enter your destination URL</Label>
+
       <Input
         ref={inputRef}
-        className="mb-5"
         placeholder="https://example.com/long-url"
         value={url}
         onChange={(e) => setUrl(e.target.value)}
+        className="mb-5"
       />
-      <Button onClick={handleCreate} disabled={loading} className="py-5">
-        {loading ? "Creating..." : "Create your Short link"}
+
+      <Button
+        onClick={handleCreate}
+        disabled={loading}
+        className="py-5"
+      >
+        {loading ? "Creating..." : "Create Short Link"}
       </Button>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      {/* Generated Link Dialog */}
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Your link is ready!</DialogTitle>
+            <DialogTitle>Your link is ready</DialogTitle>
           </DialogHeader>
+
           <p className="text-sm text-muted-foreground mb-2">
-            Copy the link below to share it or choose a platform to share it to.
+            Copy your short link or share it below.
           </p>
+
           <div className="flex items-center gap-2 bg-muted px-2 py-1 rounded-md">
             <input
               readOnly
               className="text-sm bg-transparent w-full outline-none"
               value={shortUrl}
             />
-            <Button size="sm" variant="ghost" onClick={handleCopy}>
+
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleCopy}
+            >
               <CopyIcon className="h-4 w-4" />
             </Button>
-            {copied && <span className="text-green-600 text-xs">Copied!</span>}
+
+            {copied && (
+              <span className="text-green-600 text-xs">Copied!</span>
+            )}
           </div>
 
           <div className="grid grid-cols-4 gap-2 mt-4">
-            {shareLinks.map((platform) => (
+            {shareTargets.map((action) => (
               <a
-                key={platform.label}
-                href={platform.url}
+                key={action.label}
+                href={action.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex flex-col items-center gap-1 text-xs hover:text-primary"
               >
-                {platform.icon}
-                {platform.label}
+                {action.icon}
+                {action.label}
               </a>
             ))}
           </div>
