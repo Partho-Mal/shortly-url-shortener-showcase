@@ -36,7 +36,7 @@ func SetCookieHandler(c *gin.Context) {
 	}
 
 	c.SetSameSite(sameSite)
-	c.SetCookie("token", body.Token, 30*24*60*60, "/", cookieDomain, secure, true)
+	c.SetCookie("token", body.Token, 24*60*60, "/", cookieDomain, secure, true)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Cookie set"})
 }
