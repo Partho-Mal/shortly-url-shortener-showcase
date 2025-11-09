@@ -130,8 +130,8 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
           }}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>  
+
         <WarmBackend />
         {/* 
           Issues a one-time lightweight GET /health request to the backend.
@@ -141,6 +141,7 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
           Usage:
           - Safe to keep mounted globally for best user experience.
         */}
+
 
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
