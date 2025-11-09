@@ -8,14 +8,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  FileText,
-  LogOut,
-  Moon,
-  Sun,
-  User,
-  Stars,
-} from "lucide-react";
+import { FileText, LogOut, Moon, Sun, User, Stars } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   DropdownMenu,
@@ -61,16 +54,22 @@ const Navbar = () => {
 
   const handleLogout = async (): Promise<void> => {
     try {
-      await apiFetch(
-        `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_USER_LOGOUT}`,
-        {
-          method: "POST",
-        }
-      );
+      // ❌ Temporarily skip backend logout
+      // await apiFetch(`${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_USER_LOGOUT}`, {
+      //   method: "POST",
+      // });
+
+      // ✅ Delete cookie client-side
+      document.cookie = "token=; path=/; max-age=0;";
+
+      // ✅ Delete fallback JWT
       localStorage.removeItem("jwt");
+
       router.push("/");
     } catch {
-      // Log only
+      document.cookie = "token=; path=/; max-age=0;";
+      localStorage.removeItem("jwt");
+      router.push("/");
     }
   };
 
@@ -186,10 +185,7 @@ const Navbar = () => {
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem
-              onClick={handleLogout}
-              className="text-red-600"
-            >
+            <DropdownMenuItem onClick={handleLogout} className="text-red-600">
               <LogOut className="h-[1.2rem] w-[1.2rem] mr-2 text-red-600" />
               Logout
             </DropdownMenuItem>
