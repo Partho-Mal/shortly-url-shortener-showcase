@@ -41,8 +41,8 @@ func getBaseURLFromRequest(c *gin.Context) string {
 	return fmt.Sprintf("%s://%s", scheme, c.Request.Host)
 }
 
-// ShortenPublicURL creates a public (unauthenticated) short URL.
-// The generated URL automatically expires after 2 weeks.
+// ShortenPublicURL creates a public (unauthenticated) short URL stored in Reddis.
+// The generated URL automatically expires after 1 weeks.
 func ShortenPublicURL(c *gin.Context) {
 	var input models.URLRequest
 	if err := c.ShouldBindJSON(&input); err != nil || input.OriginalURL == "" {
@@ -50,37 +50,27 @@ func ShortenPublicURL(c *gin.Context) {
 		return
 	}
 
-	db := storage.GetPostgres()
-
-	// Generate a unique slug for the URL
-	slug, err := utils.GenerateUniqueSlug(db, input.Slug, 8)
+	// Generate a unique slug (you can still use DB if you want uniqueness checks)
+	slug, err := utils.GenerateRandomSlug(8) // or GenerateUniqueSlug if you check in Redis
 	if err != nil {
-		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	urlID := uuid.NewString()
-	expiry := time.Now().Add(14 * 24 * time.Hour) // 2-week expiry
-
-	// Insert URL into the database with expires_at
-	_, err = db.Exec(`
-		INSERT INTO urls (id, original_url, slug, created_at, expires_at)
-		VALUES ($1, $2, $3, $4, $5)
-	`, urlID, input.OriginalURL, slug, time.Now(), expiry)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database insert failed"})
-		return
-	}
-
-	// Cache the URL in Redis with the same TTL
 	cacheValue := SlugCache{
 		URL:  utils.EnsureProtocol(input.OriginalURL),
 		ID:   urlID,
 		Plan: "default",
 	}
+
+	// Serialize to JSON
 	jsonVal, _ := json.Marshal(cacheValue)
 	cacheKey := "slug:" + slug
-	cacheTTL := 24 * time.Hour // 24hour expiry in redis
+
+	// Set in Redis with TTL
+	cacheTTL := 7 * 24 * time.Hour // 7 days = 1 week
+	// cacheTTL := 20 * time.Second // example 20s expiry
 	if err := storage.RedisClient.Set(storage.Ctx, cacheKey, jsonVal, cacheTTL).Err(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Redis caching failed"})
 		return
@@ -92,6 +82,63 @@ func ShortenPublicURL(c *gin.Context) {
 		"short_url": baseURL + "/" + slug,
 	})
 }
+
+
+// ShortenPublicURL creates a public (unauthenticated) short URL.
+// The generated URL never expires and stored in PostgresDB.
+
+// func ShortenPublicURL(c *gin.Context) {
+// 	var input models.URLRequest
+// 	if err := c.ShouldBindJSON(&input); err != nil || input.OriginalURL == "" {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+// 		return
+// 	}
+
+// 	db := storage.GetPostgres()
+
+// 	// Generate a unique slug for the URL
+// 	slug, err := utils.GenerateUniqueSlug(db, input.Slug, 8)
+// 	if err != nil {
+// 		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+// 		return
+// 	}
+
+// 	urlID := uuid.NewString()
+// 	// expiry := time.Now().Add(7 * 24 * time.Hour) // 1-week expiry
+// 	expiry := time.Now().Add(20 * time.Second)  // 20 -second expiry
+
+// 	// Insert URL into the database with expires_at
+// 	_, err = db.Exec(`
+// 		INSERT INTO urls (id, original_url, slug, created_at, expires_at)
+// 		VALUES ($1, $2, $3, $4, $5)
+// 	`, urlID, input.OriginalURL, slug, time.Now(), expiry)
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database insert failed"})
+// 		return
+// 	}
+
+// 	// Cache the URL in Redis with the same TTL
+// 	cacheValue := SlugCache{
+// 		URL:  utils.EnsureProtocol(input.OriginalURL),
+// 		ID:   urlID,
+// 		Plan: "default",
+// 	}
+// 	jsonVal, _ := json.Marshal(cacheValue)
+// 	cacheKey := "slug:" + slug
+// 	cacheTTL := 24 * time.Hour // 24hour expiry in redis
+// 	if err := storage.RedisClient.Set(storage.Ctx, cacheKey, jsonVal, cacheTTL).Err(); err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Redis caching failed"})
+// 		return
+// 	}
+
+// 	baseURL := getBaseURLFromRequest(c)
+// 	c.JSON(http.StatusOK, gin.H{
+// 		"slug":      slug,
+// 		"short_url": baseURL + "/" + slug,
+// 	})
+// }
+
+
 
 // ShortenURL handles authenticated URL shortening requests.
 // It validates the user, generates a unique slug, stores the URL in Postgres,

@@ -16,18 +16,16 @@ const (
 )
 
 // GenerateRandomSlug returns a cryptographically secure random Base62 slug of the specified length.
-func GenerateRandomSlug(length int) string {
+func GenerateRandomSlug(length int) (string, error) {
 	slug := make([]byte, length)
 	for i := 0; i < length; i++ {
 		n, err := rand.Int(rand.Reader, big.NewInt(int64(len(slugCharset))))
 		if err != nil {
-			// Fallback: use 'x' on failure
-			slug[i] = 'x'
-			continue
+			return "", err
 		}
 		slug[i] = slugCharset[n.Int64()]
 	}
-	return string(slug)
+	return string(slug), nil
 }
 
 // GenerateUniqueSlug generates a unique slug by checking the database.
@@ -45,7 +43,11 @@ func GenerateUniqueSlug(db *sql.DB, custom string, length int) (string, error) {
 	}
 
 	for i := 0; i < maxSlugAttempts; i++ {
-		slug := GenerateRandomSlug(length)
+		slug, err := GenerateRandomSlug(length)
+		if err != nil {
+			return "", err
+		}
+
 		available, err := IsSlugAvailable(db, slug)
 		if err != nil {
 			return "", err
@@ -54,6 +56,7 @@ func GenerateUniqueSlug(db *sql.DB, custom string, length int) (string, error) {
 			return slug, nil
 		}
 	}
+
 
 	return "", errors.New("failed to generate a unique slug after multiple attempts")
 }

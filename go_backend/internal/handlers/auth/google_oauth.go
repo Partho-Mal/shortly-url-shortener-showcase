@@ -1,5 +1,6 @@
 // Package auth provides HTTP handlers for user authentication,
 // including Google OAuth2 login, callback, and JWT session handling.
+
 package auth
 
 import (

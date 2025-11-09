@@ -8,8 +8,8 @@
 #
 # Usage:
 #   cd go_backend
-#   chmod +x ./bin/bash/docker_cleanup.sh
-#   ./bin/bash/docker_cleanup.sh
+#   chmod +x ./bin/bash/docker_cleanup_shortly.sh
+#   ./bin/bash/docker_cleanup_shortly.sh
 # ============================================================================
 
 set -e  # Exit immediately if any command fails

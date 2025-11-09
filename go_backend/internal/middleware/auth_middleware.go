@@ -1,5 +1,6 @@
 // Package middleware provides reusable Gin middleware for authentication,
 // CORS handling, rate limiting, and request blocking.
+// internal/middleware/logging.go
 package middleware
 
 import (
@@ -63,7 +64,7 @@ func CORSMiddleware() gin.HandlerFunc {
 		}
 
 		if c.Request.Method == http.MethodOptions {
-			c.AbortWithStatus(http.StatusNoContent)
+			c.AbortWithStatus(http.StatusNoContent) 
 			return
 		}
 

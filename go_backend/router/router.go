@@ -44,16 +44,18 @@ func SetupRouter(r *gin.Engine) *gin.Engine {
 	r.GET("/google/callback", auth.GoogleCallback)
 	r.POST("/register", auth.Register)
 	r.POST("/login", auth.Login)
-
+	
 	// Register protected API routes.
 	api := r.Group("/api")
-	api.Use(middleware.AuthMiddleware())
 	{
-		api.POST("/logout", auth.Logout)
+		api.POST("/publicshorturl", urls.ShortenPublicURL)
+		api.POST("/set-cookie", auth.SetCookieHandler)
 		api.GET("/validate", auth.Validate)
-		api.POST("/user/shorten", urls.ShortenURL)
-		api.GET("/user/details", users.GetUserDetails)
-		api.GET("/user/shortlinks", users.GetUserShortLinks)
+		api.POST("/logout", middleware.AuthMiddleware(), auth.Logout)
+		api.POST("/user/shorten", middleware.AuthMiddleware(), urls.ShortenURL)
+		api.POST("/delete/shortlink", middleware.AuthMiddleware(), urls.DeleteShortlink)
+		api.GET("/user/details", middleware.AuthMiddleware(), users.GetUserDetails)
+		api.GET("/user/shortlinks", middleware.AuthMiddleware(), users.GetUserShortLinks)
 	}
 
 	// Ignore favicon requests.
