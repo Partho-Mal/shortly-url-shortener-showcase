@@ -26,7 +26,7 @@ export default function AuthCallbackClient() {
     }
 
     // Forward token to backend to create auth cookie
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/set-cookie`, {
+    fetch("/api/auth/set-cookie", {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
