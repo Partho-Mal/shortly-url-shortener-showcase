@@ -276,7 +276,7 @@ MIT License
 
 ## 👤 Author
 
-Built by **Parth**
+Built by **Partho**
 
 For hiring + collaboration
 📧 **[parthoma7@gmail.com](mailto:parthoma7@gmail.com)**
